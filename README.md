@@ -215,7 +215,7 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 
 ### 1. Clone & Set Up Environment
 ```bash
-git clone https://github.com/sathish12tj/News_Classification_E2E_Deployment.git
+git clone https://github.com/sathish12tj/News-Classification-E2E-Deployment.git
 cd News_Classification_E2E_Deployment
 
 # Create & activate virtual environment

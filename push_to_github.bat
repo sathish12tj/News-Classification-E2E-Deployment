@@ -5,7 +5,7 @@ echo    News Classification Platform — Push to GitHub
 echo ======================================================================
 echo.
 echo Target GitHub Profile: https://github.com/sathish12tj
-echo Configured Remote:   https://github.com/sathish12tj/News_Classification_E2E_Deployment.git
+echo Configured Remote:   https://github.com/sathish12tj/News-Classification-E2E-Deployment.git
 echo.
 echo NOTE: If you haven't created the repository on GitHub yet:
 echo 1. Open your browser and go to: https://github.com/new
