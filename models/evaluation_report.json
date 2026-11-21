@@ -1,0 +1,134 @@
+{
+  "overall_accuracy": 0.9439,
+  "total_test_samples": 2424,
+  "macro_avg": {
+    "precision": 0.9450539278207086,
+    "recall": 0.9470200990926939,
+    "f1-score": 0.945778149757464,
+    "support": 2424.0
+  },
+  "weighted_avg": {
+    "precision": 0.9436724438977948,
+    "recall": 0.9438943894389439,
+    "f1-score": 0.9435354347333976,
+    "support": 2424.0
+  },
+  "per_class_metrics": {
+    "automobile": {
+      "precision": 0.941,
+      "recall": 0.9846,
+      "f1_score": 0.9623,
+      "support": 259
+    },
+    "entertainment": {
+      "precision": 0.9655,
+      "recall": 0.9631,
+      "f1_score": 0.9643,
+      "support": 407
+    },
+    "politics": {
+      "precision": 0.9874,
+      "recall": 0.9812,
+      "f1_score": 0.9843,
+      "support": 319
+    },
+    "science": {
+      "precision": 0.9592,
+      "recall": 0.9792,
+      "f1_score": 0.9691,
+      "support": 288
+    },
+    "sports": {
+      "precision": 0.9709,
+      "recall": 0.9658,
+      "f1_score": 0.9683,
+      "support": 380
+    },
+    "technology": {
+      "precision": 0.8952,
+      "recall": 0.8352,
+      "f1_score": 0.8642,
+      "support": 358
+    },
+    "world": {
+      "precision": 0.8962,
+      "recall": 0.9201,
+      "f1_score": 0.908,
+      "support": 413
+    }
+  },
+  "confusion_matrix": [
+    [
+      255,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0
+    ],
+    [
+      2,
+      392,
+      0,
+      0,
+      9,
+      2,
+      2
+    ],
+    [
+      0,
+      1,
+      313,
+      0,
+      0,
+      0,
+      5
+    ],
+    [
+      0,
+      2,
+      0,
+      282,
+      0,
+      4,
+      0
+    ],
+    [
+      0,
+      6,
+      3,
+      0,
+      367,
+      1,
+      3
+    ],
+    [
+      14,
+      3,
+      0,
+      8,
+      0,
+      299,
+      34
+    ],
+    [
+      0,
+      2,
+      1,
+      4,
+      2,
+      24,
+      380
+    ]
+  ],
+  "labels": [
+    "automobile",
+    "entertainment",
+    "politics",
+    "science",
+    "sports",
+    "technology",
+    "world"
+  ]
+}

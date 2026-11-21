@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  news-classifier:
+    build: .
+    container_name: news_classification_platform
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/feeds:/app/data/feeds
+      - ./models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

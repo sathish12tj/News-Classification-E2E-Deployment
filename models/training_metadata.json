@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-11-22T02:11:58.620448",
+  "total_articles": 12120,
+  "categories": [
+    "automobile",
+    "entertainment",
+    "politics",
+    "science",
+    "sports",
+    "technology",
+    "world"
+  ],
+  "train_samples_original": 9696,
+  "train_samples_resampled": 11578,
+  "test_samples": 2424,
+  "feature_count": 20000,
+  "balanced": true,
+  "classes_distribution_before": {
+    "automobile": 1034,
+    "science": 1149,
+    "technology": 1433,
+    "entertainment": 1629,
+    "world": 1654,
+    "sports": 1520,
+    "politics": 1277
+  },
+  "classes_distribution_after": {
+    "automobile": 1654,
+    "science": 1654,
+    "technology": 1654,
+    "entertainment": 1654,
+    "world": 1654,
+    "sports": 1654,
+    "politics": 1654
+  }
+}

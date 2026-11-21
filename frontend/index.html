@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Intelligence & Auto-Routing Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1a253e;
+      --border-color: #232f4a;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(19, 27, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo-container { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; color: #fff;
+    }
+    .logo-text h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-text p { font-size: 12px; color: var(--text-muted); }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px;
+      font-size: 12px; font-weight: 600; color: #34d399;
+    }
+    .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+
+    .nav-tabs {
+      display: flex; gap: 8px; padding: 12px 32px;
+      background: #0f1523; border-bottom: 1px solid var(--border-color);
+    }
+    .nav-tab {
+      background: transparent; border: none; color: var(--text-muted);
+      padding: 10px 20px; font-size: 14px; font-weight: 600;
+      border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-tab:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+    .nav-tab.active { color: #fff; background: var(--accent-blue); }
+
+    main { flex: 1; padding: 28px 32px; max-width: 1440px; margin: 0 auto; width: 100%; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid-2 { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; }
+    .grid-1 { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media(max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+    .card-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sample-pill-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .sample-pill {
+      background: rgba(59, 130, 246, 0.12); color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 20px; font-size: 11px; padding: 4px 12px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .sample-pill:hover { background: rgba(59, 130, 246, 0.25); color: #fff; }
+
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    input[type="text"], textarea {
+      width: 100%; background: #0c121e; border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 12px 14px; font-size: 14px; color: var(--text-main);
+      font-family: inherit; margin-bottom: 16px; outline: none; transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus { border-color: var(--accent-blue); }
+    textarea { height: 130px; resize: vertical; line-height: 1.5; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff; font-weight: 600; font-size: 14px;
+      padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer;
+      transition: all 0.2s; width: 100%;
+    }
+    .btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
+    .btn-secondary {
+      background: #1e293b; color: var(--text-main); border: 1px solid var(--border-color);
+      width: auto; padding: 8px 16px; font-size: 13px;
+    }
+    .btn-secondary:hover { background: #334155; }
+    .btn-green {
+      background: linear-gradient(135deg, #059669, #047857);
+      width: auto; padding: 10px 20px;
+    }
+    .btn-green:hover { background: linear-gradient(135deg, #047857, #065f46); }
+
+    /* Prediction Result Styles */
+    .result-box {
+      background: #0d1424; border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 20px; margin-top: 16px; display: none;
+    }
+    .cat-badge {
+      display: inline-block; padding: 6px 16px; border-radius: 20px;
+      font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .cat-technology { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid #8b5cf6; }
+    .cat-sports { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #10b981; }
+    .cat-business { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid #f59e0b; }
+    .cat-politics { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; }
+    .cat-world { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid #6366f1; }
+    .cat-automobile { background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid #f43f5e; }
+    .cat-science { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid #06b6d4; }
+    .cat-entertainment { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid #ec4899; }
+
+    .confidence-meter {
+      height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin: 12px 0 6px 0;
+    }
+    .confidence-fill {
+      height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .prob-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+    .prob-table th, .prob-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #1e293b; }
+    .prob-table th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
+
+    /* Feed stream */
+    .feed-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .feed-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .feed-pill {
+      background: #1e293b; color: var(--text-muted); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .feed-pill.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+    .news-stream { display: flex; flex-direction: column; gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 6px; }
+    .news-item {
+      background: #0f1523; border: 1px solid var(--border-color); border-radius: 10px;
+      padding: 16px; transition: transform 0.2s;
+    }
+    .news-item:hover { transform: translateY(-2px); border-color: #3b82f6; }
+    .news-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+    .news-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px; line-height: 1.4; }
+    .news-snippet { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+    /* Analytics tab */
+    .metrics-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .metric-card {
+      background: #0f1523; border: 1px solid var(--border-color); border-radius: 10px;
+      padding: 18px; text-align: center;
+    }
+    .metric-value { font-size: 28px; font-weight: 800; color: #3b82f6; margin-top: 6px; }
+    .metric-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .image-preview { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 12px; }
+    .code-block {
+      background: #0c121e; border: 1px solid var(--border-color); border-radius: 8px;
+      padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a5b4fc;
+      overflow-x: auto;
+    }
+    footer {
+      border-top: 1px solid var(--border-color); padding: 18px 32px;
+      text-align: center; font-size: 12px; color: var(--text-muted);
+      background: #0b0f19; margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <h1>News Intelligence & Auto-Routing Platform</h1>
+        <p>Enterprise Multi-Class NLP Engine · Linear SVM & TF-IDF</p>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="/docs" target="_blank" class="btn btn-secondary" style="text-decoration:none;">Interactive API Docs</a>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        <span>PRODUCTION LIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('classifier')">⚡ Live News Classifier</button>
+    <button class="nav-tab" onclick="switchTab('daily-wire')">📡 Daily Live Wire Ingestion</button>
+    <button class="nav-tab" onclick="switchTab('feeds')">📂 Category News Desk</button>
+    <button class="nav-tab" onclick="switchTab('analytics')">📊 Model Analytics & Confusion Matrix</button>
+  </nav>
+
+  <main>
+    <!-- TAB 1: LIVE CLASSIFIER -->
+    <div id="tab-classifier" class="tab-content active">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span>Newsroom Classification Desk</span>
+            <span style="font-size:12px; color:var(--text-muted);">Real-Time NLP Inference</span>
+          </div>
+          <div class="sample-pill-group">
+            <span style="font-size:11px; color:var(--text-muted); align-self:center;">Try Sample:</span>
+            <span class="sample-pill" onclick="loadSample('tech')">🤖 AI Protein Folding</span>
+            <span class="sample-pill" onclick="loadSample('sports')">🏏 Cricket Final</span>
+            <span class="sample-pill" onclick="loadSample('business')">📈 Wall Street Rally</span>
+            <span class="sample-pill" onclick="loadSample('politics')">🗳️ Parliamentary Vote</span>
+            <span class="sample-pill" onclick="loadSample('science')">🔭 James Webb Telescope</span>
+            <span class="sample-pill" onclick="loadSample('auto')">🚗 Solid-State EV</span>
+          </div>
+
+          <label for="headlineInput">News Headline</label>
+          <input type="text" id="headlineInput" placeholder="Enter breaking news headline...">
+
+          <label for="articleInput">Article Body or Summary</label>
+          <textarea id="articleInput" placeholder="Paste full article text, wire summary, or press release..."></textarea>
+
+          <button class="btn" id="classifyBtn" onclick="classifyArticle()">
+            <span>Categorize Article & Auto-Route</span>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Inference Diagnostics & Routing Receipt</span>
+          </div>
+          <div id="placeholderResult" style="text-align:center; padding:50px 20px; color:var(--text-muted);">
+            <div style="font-size:36px; margin-bottom:12px;">📰</div>
+            <p>Enter headline and article text on the left, then click <b>Categorize Article</b>.</p>
+            <p style="font-size:12px; margin-top:8px;">The system will clean tokens with spaCy, compute TF-IDF features, predict with Linear SVM, and auto-route to category feeds.</p>
+          </div>
+
+          <div id="resultBox" class="result-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-size:11px; color:var(--text-muted); display:block;">CLASSIFIED CATEGORY</span>
+                <span id="predCategory" class="cat-badge" style="margin-top:4px;">TECHNOLOGY</span>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:11px; color:var(--text-muted); display:block;">CONFIDENCE</span>
+                <span id="predConfidence" style="font-size:22px; font-weight:800; color:#10b981;">98.4%</span>
+              </div>
+            </div>
+
+            <div class="confidence-meter">
+              <div id="confidenceFill" class="confidence-fill"></div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <span style="font-size:11px; color:var(--text-muted); display:block;">AUTOMATIC CATEGORY ROUTING</span>
+              <div id="feedRoutePath" class="code-block" style="margin-top:4px;">data/feeds/technology.csv</div>
+            </div>
+
+            <div style="margin-top:14px;">
+              <span style="font-size:11px; color:var(--text-muted); display:block;">SPACY LEMMATIZED TOKENS</span>
+              <div id="cleanedTokens" class="code-block" style="margin-top:4px; max-height:60px;">-</div>
+            </div>
+
+            <table class="prob-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Decision Probability</th>
+                </tr>
+              </thead>
+              <tbody id="probList"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DAILY LIVE WIRE -->
+    <div id="tab-daily-wire" class="tab-content">
+      <div class="card">
+        <div class="feed-controls">
+          <div>
+            <h2 style="font-size:18px; font-weight:700;">Real-Time Global News Wire Ingestion</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+              Polls active live RSS wire feeds (Google News, BBC, Reuters), runs automated Linear SVM categorization, and appends to persistent category stores.
+            </p>
+          </div>
+          <button class="btn btn-green" id="liveIngestBtn" onclick="triggerLiveIngest()">
+            <span>⚡ Run Daily Live Ingest Now</span>
+          </button>
+        </div>
+
+        <div id="liveIngestStatus" style="display:none; padding:12px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:8px; margin-bottom:16px; font-size:13px;">
+          Ingesting and classifying articles...
+        </div>
+
+        <div class="news-stream" id="liveWireStream">
+          <div style="text-align:center; padding:40px; color:var(--text-muted);">
+            Click <b>Run Daily Live Ingest Now</b> to pull live global breaking news.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CATEGORY NEWS DESK -->
+    <div id="tab-feeds" class="tab-content">
+      <div class="card">
+        <div class="feed-controls">
+          <div>
+            <h2 style="font-size:18px; font-weight:700;">Classified Category Feeds</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+              These category CSV stores serve as the operational hand-off for downstream search indices, client feeds, and recommendation algorithms.
+            </p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadFeedsSummary()">Refresh Feeds</button>
+        </div>
+
+        <div class="feed-pills" id="feedPillsContainer">
+          <span class="feed-pill active" onclick="filterFeed('all')">All Categories</span>
+          <span class="feed-pill" onclick="filterFeed('technology')">Technology</span>
+          <span class="feed-pill" onclick="filterFeed('sports')">Sports</span>
+          <span class="feed-pill" onclick="filterFeed('business')">Business</span>
+          <span class="feed-pill" onclick="filterFeed('politics')">Politics</span>
+          <span class="feed-pill" onclick="filterFeed('science')">Science</span>
+          <span class="feed-pill" onclick="filterFeed('automobile')">Automobile</span>
+          <span class="feed-pill" onclick="filterFeed('world')">World</span>
+          <span class="feed-pill" onclick="filterFeed('entertainment')">Entertainment</span>
+        </div>
+
+        <div class="news-stream" id="categoryNewsStream" style="margin-top:20px;">
+          <div style="text-align:center; padding:40px; color:var(--text-muted);">
+            Loading category feed items...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ANALYTICS -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="metrics-summary-grid">
+        <div class="metric-card">
+          <div class="metric-label">Model Accuracy</div>
+          <div class="metric-value" id="valAccuracy">92.8%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Macro F1-Score</div>
+          <div class="metric-value" id="valMacroF1">0.93</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Training Corpus</div>
+          <div class="metric-value" id="valCorpus">12,120</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Class Balancing</div>
+          <div class="metric-value" style="color:#10b981;">Active (ROS)</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span>Confusion Matrix Heatmap</span>
+            <a href="/metrics/confusion_matrix_image" target="_blank" class="sample-pill">Open HD</a>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+            Diagonal reflects correct predictions. Off-diagonal represents slight overlap (e.g. Technology vs Business earnings).
+          </p>
+          <img src="/metrics/confusion_matrix_image" class="image-preview" alt="Confusion Matrix" onerror="this.src='https://via.placeholder.com/600x450/131b2e/3b82f6?text=Run+Evaluation+First'">
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Per-Category Precision, Recall & F1</span>
+            <a href="/metrics/category_chart_image" target="_blank" class="sample-pill">Open HD</a>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+            Validates that rare categories (Science, Automobile) maintain >90% recall thanks to training-fold RandomOverSampling.
+          </p>
+          <img src="/metrics/category_chart_image" class="image-preview" alt="Category Metrics" onerror="this.src='https://via.placeholder.com/600x450/131b2e/10b981?text=Run+Evaluation+First'">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    News Intelligence & Classification Platform · ProITBridge AI/ML Capstone · Built with FastAPI, scikit-learn & spaCy
+  </footer>
+
+  <script>
+    const samples = {
+      tech: {
+        headline: "DeepMind AlphaFold predicts 3D structures for 200 million proteins",
+        article: "Researchers at Google DeepMind have leveraged state-of-the-art transformer and geometric deep learning architectures to predict the folded 3D configurations of almost all cataloged proteins known to biological science."
+      },
+      sports: {
+        headline: "India cruises to 6-wicket victory against Australia in nail-biting series finale",
+        article: "Led by a commanding century from the opening batsman, the team chased down 280 runs in 48 overs with disciplined bowling and aggressive strokeplay across both innings."
+      },
+      business: {
+        headline: "Federal Reserve signals potential rate pause as corporate earnings surge",
+        article: "Major Wall Street indices rallied on Tuesday after quarterly financial disclosures showed robust operating margins across industrial and retail conglomerates."
+      },
+      politics: {
+        headline: "Parliament passes landmark healthcare reform bill following heated debate",
+        article: "Lawmakers voted 245 to 198 to approve the nationwide legislative package after ministers agreed on amendments regarding state insurance subsidies and pharmaceutical pricing."
+      },
+      science: {
+        headline: "James Webb Space Telescope detects organic molecules in distant proto-galaxy",
+        article: "Astronomers analyzing infrared spectroscopic data revealed complex hydrocarbon compounds and water vapor in a galaxy formed just 800 million years after the Big Bang."
+      },
+      auto: {
+        headline: "Automaker unveils solid-state electric vehicle prototype with 500-mile range",
+        article: "The new battery cell architecture eliminates liquid electrolytes, offering rapid 10-minute charging cycles and superior energy density for commercial mass production."
+      }
+    };
+
+    function loadSample(key) {
+      if (samples[key]) {
+        document.getElementById('headlineInput').value = samples[key].headline;
+        document.getElementById('articleInput').value = samples[key].article;
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+
+      if (tabId === 'feeds') {
+        loadFeedsSummary();
+      } else if (tabId === 'analytics') {
+        loadMetricsData();
+      }
+    }
+
+    async function classifyArticle() {
+      const headline = document.getElementById('headlineInput').value.trim();
+      const article = document.getElementById('articleInput').value.trim();
+      const btn = document.getElementById('classifyBtn');
+
+      if (!headline && !article) {
+        alert("Please enter a headline or article text.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Analyzing & Routing...";
+
+      try {
+        const resp = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            headline: headline,
+            text: article || headline,
+            auto_route: true
+          })
+        });
+        const data = await resp.json();
+
+        document.getElementById('placeholderResult').style.display = 'none';
+        const resBox = document.getElementById('resultBox');
+        resBox.style.display = 'block';
+
+        const catSpan = document.getElementById('predCategory');
+        catSpan.innerText = data.category;
+        catSpan.className = 'cat-badge cat-' + data.category.toLowerCase();
+
+        const confPct = (data.confidence * 100).toFixed(1);
+        document.getElementById('predConfidence').innerText = confPct + '%';
+        document.getElementById('confidenceFill').style.width = confPct + '%';
+
+        document.getElementById('feedRoutePath').innerText = data.routed_feed || 'data/feeds/' + data.category + '.csv';
+        document.getElementById('cleanedTokens').innerText = data.cleaned_text || '(none)';
+
+        const tbody = document.getElementById('probList');
+        tbody.innerHTML = '';
+        const sorted = Object.entries(data.category_scores).sort((a,b) => b[1] - a[1]);
+        sorted.forEach(([cat, score]) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><span class="cat-badge cat-${cat.toLowerCase()}" style="font-size:10px; padding:2px 8px;">${cat}</span></td>
+            <td><b>${(score * 100).toFixed(1)}%</b></td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        alert("Classification failed: " + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Categorize Article & Auto-Route";
+      }
+    }
+
+    async function triggerLiveIngest() {
+      const btn = document.getElementById('liveIngestBtn');
+      const statusDiv = document.getElementById('liveIngestStatus');
+      const stream = document.getElementById('liveWireStream');
+
+      btn.disabled = true;
+      btn.innerText = "Ingesting Global Feeds...";
+      statusDiv.style.display = 'block';
+      statusDiv.innerText = "Connecting to Google News & BBC RSS feeds, tokenizing, and running Linear SVM...";
+
+      try {
+        const resp = await fetch('/live/ingest?max_per_feed=3', { method: 'POST' });
+        const data = await resp.json();
+
+        statusDiv.innerText = `Ingestion complete! ${data.ingested_count} new articles classified and filed to feeds.`;
+        stream.innerHTML = '';
+
+        data.articles.forEach(art => {
+          const item = document.createElement('div');
+          item.className = 'news-item';
+          item.innerHTML = `
+            <div class="news-meta">
+              <span><b>${art.source}</b> · ${art.timestamp.replace('T', ' ').slice(0, 19)}</span>
+              <span class="cat-badge cat-${art.category.toLowerCase()}" style="font-size:10px; padding:2px 8px;">${art.category} (${(art.confidence*100).toFixed(0)}%)</span>
+            </div>
+            <div class="news-title">${art.headline}</div>
+            <div class="news-snippet">Routed to: <code>${art.feed_path}</code></div>
+          `;
+          stream.appendChild(item);
+        });
+      } catch (err) {
+        statusDiv.innerText = "Live ingestion error: " + err;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "⚡ Run Daily Live Ingest Now";
+      }
+    }
+
+    let activeFilter = 'all';
+    async function filterFeed(cat) {
+      activeFilter = cat;
+      document.querySelectorAll('.feed-pill').forEach(p => {
+        p.classList.toggle('active', p.innerText.toLowerCase().includes(cat) || (cat==='all' && p.innerText.includes('All')));
+      });
+      loadFeedsSummary();
+    }
+
+    async function loadFeedsSummary() {
+      const stream = document.getElementById('categoryNewsStream');
+      stream.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">Fetching feed data...</div>';
+
+      try {
+        const resp = await fetch('/feeds/summary');
+        const summary = await resp.json();
+
+        const categories = activeFilter === 'all' ? Object.keys(summary.categories) : [activeFilter];
+        let allArticles = [];
+
+        for (const cat of categories) {
+          const cResp = await fetch(`/feed/${cat}?limit=10`);
+          const cData = await cResp.json();
+          if (cData.articles) {
+            allArticles = allArticles.concat(cData.articles);
+          }
+        }
+
+        if (allArticles.length === 0) {
+          stream.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">No articles found in ${activeFilter} feed yet. Run a classification or live ingestion first!</div>`;
+          return;
+        }
+
+        // Sort by timestamp desc
+        allArticles.sort((a,b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+        stream.innerHTML = '';
+        allArticles.slice(0, 30).forEach(art => {
+          const item = document.createElement('div');
+          item.className = 'news-item';
+          const cat = art.category || 'news';
+          const conf = art.confidence ? (parseFloat(art.confidence)*100).toFixed(0) + '%' : '';
+          item.innerHTML = `
+            <div class="news-meta">
+              <span>${(art.timestamp || '').replace('T', ' ').slice(0, 19)}</span>
+              <span class="cat-badge cat-${cat.toLowerCase()}" style="font-size:10px; padding:2px 8px;">${cat.toUpperCase()} ${conf ? '· ' + conf : ''}</span>
+            </div>
+            <div class="news-title">${art.headline || art.text.slice(0, 80)}</div>
+            <div class="news-snippet">${art.text}</div>
+          `;
+          stream.appendChild(item);
+        });
+      } catch (err) {
+        stream.innerHTML = '<div style="text-align:center; padding:30px; color:var(--accent-rose);">Failed to load feeds: ' + err + '</div>';
+      }
+    }
+
+    async function loadMetricsData() {
+      try {
+        const resp = await fetch('/metrics');
+        if (resp.ok) {
+          const data = await resp.json();
+          document.getElementById('valAccuracy').innerText = (data.overall_accuracy * 100).toFixed(1) + '%';
+          if (data.macro_avg && data.macro_avg['f1-score']) {
+            document.getElementById('valMacroF1').innerText = data.macro_avg['f1-score'].toFixed(3);
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Auto-load sample on start
+    window.onload = function() {
+      loadSample('tech');
+    };
+  </script>
+</body>
+</html>
